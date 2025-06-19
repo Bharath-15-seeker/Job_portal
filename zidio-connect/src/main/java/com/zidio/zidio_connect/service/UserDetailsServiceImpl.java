@@ -12,25 +12,24 @@ import java.util.Collections;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserRepository userRepo;
 
     @Autowired
     public UserDetailsServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+        this.userRepo = userRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // Spring Security expects roles to be prefixed with "ROLE_"
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole());
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                Collections.singleton(authority)
-        );
+        // 👉 Build user details with enabled/disabled flag
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .authorities("ROLE_" + user.getRole())
+                .disabled(!user.isActive())         // <‑‑ key line
+                .build();
     }
 }

@@ -15,6 +15,7 @@ public class StudentProfile {
 
     @OneToOne
     @MapsId
+    @JoinColumn(name = "user_id")
     private User user;
 
     private String university;

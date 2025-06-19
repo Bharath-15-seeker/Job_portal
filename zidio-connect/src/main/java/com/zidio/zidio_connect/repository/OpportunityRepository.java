@@ -8,4 +8,6 @@ import java.util.List;
 public interface OpportunityRepository extends JpaRepository<Opportunity, Long> {
     List<Opportunity> findByTitleContainingIgnoreCase(String title);
     List<Opportunity> findByPostedById(Long recruiterId);
+
+    void deleteByPostedBy_Id(Long id);
 }

@@ -1,27 +1,67 @@
 package com.zidio.zidio_connect.service;
 
+import com.zidio.zidio_connect.dto.RecruiterProfileRequest;
+import com.zidio.zidio_connect.dto.RecruiterProfileResponse;
 import com.zidio.zidio_connect.model.RecruiterProfile;
 import com.zidio.zidio_connect.repository.RecruiterProfileRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class RecruiterProfileService {
-    @Autowired
-    private RecruiterProfileRepository recruiterRepo;
 
-    public Optional<RecruiterProfile> getByUserId(Long userId) {
-        return recruiterRepo.findByUserId(userId);
+    private final RecruiterProfileRepository repo;
+
+    @Transactional
+    public RecruiterProfileResponse saveProfile(RecruiterProfileRequest dto) {
+
+
+        RecruiterProfile entity = repo.findByUserId(dto.getUserId())
+                .orElse(new RecruiterProfile());
+
+        entity.setUserId(dto.getUserId());
+        entity.setCompanyName(dto.getCompanyName());
+        entity.setDesignation(dto.getDesignation());
+        entity.setCompanyWebsite(dto.getCompanyWebsite());
+
+
+        RecruiterProfile saved = repo.save(entity);
+        return mapToResponse(saved);
     }
 
-    public RecruiterProfile saveProfile(RecruiterProfile profile) {
-        return recruiterRepo.save(profile);
+    @Transactional(readOnly = true)
+    public RecruiterProfileResponse getByCompanyName(String companyName) {
+
+        RecruiterProfile profile = repo.findByCompanyName(companyName)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "No recruiter profile for company: " + companyName));
+
+        return mapToResponse(profile);
     }
 
-    public Optional<RecruiterProfile> getByCompanyName(String companyName) {
-        return recruiterRepo.findByCompanyName(companyName);
+
+    @Transactional(readOnly = true)
+    public RecruiterProfileResponse getByUserId(Long userId) {
+
+        RecruiterProfile profile = repo.findByUserId(userId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "No recruiter profile for user‑id: " + userId));
+
+        return mapToResponse(profile);
     }
 
+    private RecruiterProfileResponse mapToResponse(RecruiterProfile p) {
+        RecruiterProfileResponse r = new RecruiterProfileResponse();
+        r.setId(p.getId());
+        r.setUserId(p.getUserId());
+        r.setCompanyName(p.getCompanyName());
+        r.setDesignation(p.getDesignation());
+        r.setCompanyWebsite(p.getCompanyWebsite());
+        r.setVersion(p.getVersion());
+        return r;
+    }
 }

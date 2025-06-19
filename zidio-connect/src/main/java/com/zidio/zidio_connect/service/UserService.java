@@ -1,6 +1,7 @@
 package com.zidio.zidio_connect.service;
 
-import com.zidio.zidio_connect.dto.UserDTO;
+
+import com.zidio.zidio_connect.dto.UserRequest;
 import com.zidio.zidio_connect.model.User;
 import com.zidio.zidio_connect.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +23,11 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public UserDTO getCurrentUser(UserDetails userDetails) {
+    public UserRequest getCurrentUser(UserDetails userDetails) {
         // You can already access email from userDetails.getUsername()
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return new UserDTO(user);
+        return new UserRequest(user);
     }
 
 }

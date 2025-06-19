@@ -4,6 +4,7 @@ import com.zidio.zidio_connect.model.Opportunity;
 import com.zidio.zidio_connect.service.OpportunityService;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,7 +14,9 @@ public class OpportunityController {
     @Autowired
     private OpportunityService opportunityService;
 
+
     @PostMapping("/post")
+    @PreAuthorize("hasRole('RECRUITER')")
     public ResponseEntity<?> postOpportunity(@RequestBody Opportunity opp) {
         return ResponseEntity.ok(opportunityService.postOpportunity(opp));
     }

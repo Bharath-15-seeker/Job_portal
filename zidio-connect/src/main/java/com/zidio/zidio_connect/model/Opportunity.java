@@ -2,6 +2,8 @@ package com.zidio.zidio_connect.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 
@@ -16,7 +18,10 @@ public class Opportunity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @ManyToOne
+    @JoinColumn(name = "posted_by_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User postedBy; // Recruiter
 
     private String title;
